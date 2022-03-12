@@ -15,9 +15,42 @@ main {
     padding-bottom: 1rem;
     border-bottom: 1px solid #ccc;
 }
+/* .panel
+{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+} */
+#time
+{
+    display: flex;
+    margin-top: 50px;
+}
+#interview-panel
+{
+    display: flex;
+    
+   
+}
+#interviewee
+{
+    margin-right: 30px;
+
+}
+
+#startTime
+{
+    margin-right: 20px;
+}
+#scheduleBtn
+{
+    margin-top: 20px;
+}
 
 .container {
     margin-top: 20px;
+    display: flex;
+    justify-content: center;
 }
 
 .btn-primary {
