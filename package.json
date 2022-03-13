@@ -2,7 +2,7 @@
   "name": "scaler_project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./server/index.js",
   "dependencies": {
     "express": "^4.17.3",
     "uuid": "^8.3.2"
@@ -10,7 +10,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node index.js"
+    "start":"nodemon ./server/index.js"
   },
   "author": "",
   "license": "ISC"
