@@ -1,4 +1,5 @@
 const express = require('express')
+const firebase=require('../config');
 const app = express()
 const port = 3000
 const path = require('path');
