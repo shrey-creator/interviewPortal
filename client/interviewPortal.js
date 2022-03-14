@@ -151,7 +151,7 @@ function isIndividualBusy(individualData,schemaName)
     let flag=0;
     if(interviewTimings)
     interviewTimings.forEach((timing)=>{
-        if((individualData.startTime>=timing[0] && individualData.startTime<=timing[1]) || (individualData.endTime>=timing[0] && individualData.endTime<=timing[1]) )
+        if((individualData.startTime>=timing[0] && individualData.startTime<=timing[1]) || (individualData.endTime>=timing[0] && individualData.endTime<=timing[1])||(individualData.startTime<=timing[0] && individualData.endTime>=timing[1]) )
         {
             console.log('individual busy');
             flag=1;
