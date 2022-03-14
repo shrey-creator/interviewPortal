@@ -22,7 +22,7 @@ async function main(interviewee,interviewer,startTime,endTime) {
     secure: false, // true for 465, false for other ports
     auth: {
       user: "shrey.agrawal003@gmail.com", // generated ethereal user
-      pass: "shrey001@" // generated ethereal password
+     
     },
   });
 
