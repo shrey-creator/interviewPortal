@@ -8,6 +8,8 @@ function onLoad()
     addInterviewToTable(participant);
     })
 }
+
+
 function onScheduleClick()
 {
     let intervieweeEmail=document.getElementById("interviewee").value;
@@ -34,6 +36,8 @@ function onScheduleClick()
     }
     
 }
+
+// getter methods
 function getParticipantsSchema()
 {
     let participantSchema=JSON.parse(localStorage.getItem("participantSchema"));
@@ -51,6 +55,7 @@ function saveParticipantData(participantsData)
 
 }
 
+
 function getSchema(schemaName)
 {
     let intervieweeSchema=JSON.parse(localStorage.getItem(schemaName));
@@ -59,33 +64,75 @@ function getSchema(schemaName)
 
     return {};
 }
-function checkIntervieweePresence(intervieweeSchema,interviewee)
-{
-    let isIntervieweePresent=false;
-    intervieweeSchema.map((participant)=>{
-        if(participant.email===interviewee.email)
-        {
-            start_end_time=[interviewee.time[0][0],interviewee.time[0][1]];
-    
-            participant.time.push(start_end_time);
-            isIntervieweePresent=true;
-        }
-        return participant
-    });
-    return [isIntervieweePresent,intervieweeSchema];
 
-}
-
-function saveIndividualSchema(participantData,schemaName)
+function getIndividualDetails(participantData,schemaName)
 {
     let schema=getSchema(schemaName);
+    if(schema)
+    {
     let interviewTiming=[participantData.startTime,participantData.endTime];
     let emailTosave;
     if(schemaName==="intervieweeSchema")
+    {
     emailTosave=participantData.intervieweeEmail;
+    }
     else
     emailTosave=participantData.interviewerEmail;
     let entryData=schema[emailTosave];
+    return {schema,interviewTiming,emailTosave,entryData};
+}
+}
+function getParticipantDiv(interviewData)
+{
+    let data_div=document.createElement("tr");
+    
+    let intervieweeEmail=document.createElement("td");
+    intervieweeEmail.setAttribute("class","intervieweeEmail");
+    intervieweeEmail.innerHTML=interviewData.intervieweeEmail;
+    let interviewerEmail=document.createElement("td");
+    interviewerEmail.setAttribute("class","interviewerEmail");
+    interviewerEmail.innerHTML=interviewData.interviewerEmail;
+    
+
+    let startTime=document.createElement("td");
+    startTime.setAttribute("class","startTime");
+    startTime.innerHTML=interviewData.startTime;
+    let endTime=document.createElement("td")
+    endTime.setAttribute("class","endTime");;
+    endTime.innerHTML=interviewData.endTime;
+    let td_edit=document.createElement("td");
+    let editBtn=document.createElement("button");
+    editBtn.innerHTML="EDIT";
+    editBtn.onclick=function(eve)
+    {
+        onEdit(eve);
+    };;
+    td_edit.appendChild(editBtn);
+    let td_delete=document.createElement("td");
+    let DeleteBtn=document.createElement("button");
+    DeleteBtn.onclick=function(eve)
+    {
+        onDelete(eve);
+    };
+    DeleteBtn.innerHTML="DELETE";
+    td_delete.appendChild(DeleteBtn);
+
+    data_div.appendChild(interviewerEmail);
+    data_div.appendChild(intervieweeEmail);
+    
+    data_div.appendChild(startTime);
+    data_div.appendChild(endTime);
+    data_div.appendChild(td_delete);
+    data_div.appendChild(td_edit);
+    
+    return data_div;
+    
+}
+
+//                              saving data to database
+function saveIndividualSchema(participantData,schemaName)
+{
+    let {schema,interviewTiming,emailTosave,entryData}=getIndividualDetails(participantData,schemaName);
    
     if(entryData)
     {
@@ -99,22 +146,11 @@ function saveIndividualSchema(participantData,schemaName)
         };
 
     }
-
     localStorage.setItem(schemaName,JSON.stringify(schema));
 }
-function getParticipants()
-{
-    let intervieweeName=document.getElementById("interviewee").value;
-    var selected = [];
-    for (var option of document.getElementById('interviewee').options) {
-        if (option.selected) {
-      selected.push(option.value);
-        }
-    }
-return selected;
-}
 
-// check if interviewee or interviewer is free for interview
+
+//  check if interviewee or interviewer is free for interview
 function isIndividualBusy(individualData,schemaName)
 {
     let individualSchema=getSchema(schemaName);
@@ -130,7 +166,7 @@ function isIndividualBusy(individualData,schemaName)
     {
     let interviewTimings=individual.timing;
     let flag=0;
-
+    if(interviewTimings)
     interviewTimings.forEach((timing)=>{
         if((individualData.startTime>=timing[0] && individualData.startTime<=timing[1]) || (individualData.endTime>=timing[0] && individualData.endTime<=timing[1]) )
         {
@@ -193,53 +229,13 @@ function addInterviewToTable(interviewData)
     tableList.appendChild(tr1);
 }
 
-function getParticipantDiv(interviewData)
+
+
+// util methods
+function saveSchema(data,schemaName)
 {
-    let data_div=document.createElement("tr");
-    
-    let intervieweeEmail=document.createElement("td");
-    intervieweeEmail.setAttribute("class","intervieweeEmail");
-    intervieweeEmail.innerHTML=interviewData.intervieweeEmail;
-    let interviewerEmail=document.createElement("td");
-    interviewerEmail.setAttribute("class","interviewerEmail");
-    interviewerEmail.innerHTML=interviewData.interviewerEmail;
-    
-
-    let startTime=document.createElement("td");
-    startTime.setAttribute("class","startTime");
-    startTime.innerHTML=interviewData.startTime;
-    let endTime=document.createElement("td")
-    endTime.setAttribute("class","endTime");;
-    endTime.innerHTML=interviewData.endTime;
-    let td_edit=document.createElement("td");
-    let editBtn=document.createElement("button");
-    editBtn.innerHTML="EDIT";
-    editBtn.onclick=function(eve)
-    {
-        onEdit(eve);
-    };;
-    td_edit.appendChild(editBtn);
-    let td_delete=document.createElement("td");
-    let DeleteBtn=document.createElement("button");
-    DeleteBtn.onclick=function(eve)
-    {
-        onDelete(eve);
-    };
-    DeleteBtn.innerHTML="DELETE";
-    td_delete.appendChild(DeleteBtn);
-
-    data_div.appendChild(interviewerEmail);
-    data_div.appendChild(intervieweeEmail);
-    
-    data_div.appendChild(startTime);
-    data_div.appendChild(endTime);
-    data_div.appendChild(td_delete);
-    data_div.appendChild(td_edit);
-    
-    return data_div;
-    
+    localStorage.setItem(schemaName,JSON.stringify(data));
 }
-
 function showErrorMessage(errorMessage)
 {
     let error_para=document.getElementById("errorMessage");
@@ -250,8 +246,16 @@ function clearErrorField()
     let error_para=document.getElementById("errorMessage");
     error_para.innerHTML='';
 }
+function clearInputFields()
+{
+    let startTime=document.getElementById("startTime");
+    let endTime=document.getElementById("endTime");
+    startTime.value="";
+    endTime.value="";
 
-//
+}
+
+// method used to edit
 function onEdit(event)
 {
     //getting all values from table
@@ -374,19 +378,9 @@ function editToSchedule()
     mainHeading.innerHTML="Schedule a Interview";
     scheduleInterviewBtn.innerHTML="Schedule Interview"
 }
-function clearInputFields()
-{
-    let startTime=document.getElementById("startTime");
-    let endTime=document.getElementById("endTime");
-    startTime.value="";
-    endTime.value="";
 
-}
+// methods used for deleting in databases
 
-function saveSchema(data,schemaName)
-{
-    localStorage.setItem(schemaName,JSON.stringify(data));
-}
 function deleteInDatabase(participantToDelete)
 {
     let allparicipants=getParticipantsSchema();
@@ -470,3 +464,34 @@ function onDelete(event)
 
 
 
+
+
+// function getParticipants()
+// {
+//     let intervieweeName=document.getElementById("interviewee").value;
+//     var selected = [];
+//     for (var option of document.getElementById('interviewee').options) {
+//         if (option.selected) {
+//       selected.push(option.value);
+//         }
+//     }
+// return selected;
+// }
+
+
+// function checkIntervieweePresence(intervieweeSchema,interviewee)
+// {
+//     let isIntervieweePresent=false;
+//     intervieweeSchema.map((participant)=>{
+//         if(participant.email===interviewee.email)
+//         {
+//             start_end_time=[interviewee.time[0][0],interviewee.time[0][1]];
+    
+//             participant.time.push(start_end_time);
+//             isIntervieweePresent=true;
+//         }
+//         return participant
+//     });
+//     return [isIntervieweePresent,intervieweeSchema];
+
+// }

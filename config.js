@@ -1,4 +1,5 @@
-const firebase=require("firebase");
+const firebase=require('firebase');
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyBM7xINkwLw8bqA4qhJEXk2oMFcUxvugUU",
@@ -10,10 +11,10 @@ const firebaseConfig = {
     measurementId: "G-SN3C9YD895"
   };
 
-firebase.initialiseAoo(firebaseConfig);
-const db=firebase.firestore();
-const participants=db.collection("participantsSchema");
-const interviewer=db.collection("interviewerSchema");
-const interviewee=db.collection("intervieweeSchema");
+const app=firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const participantsSchema=db.collection("participantsSchema");
+const interviewerSchema=db.collection("interviewerSchema");
+const intervieweeSchema=db.collection("intervieweeSchema");
 
 module.exports={participantsSchema,interviewerSchema,intervieweeSchema};
