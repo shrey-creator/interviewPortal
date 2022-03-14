@@ -216,11 +216,37 @@ function saveSchema(data,schemaName)
 {
     localStorage.setItem(schemaName,JSON.stringify(data));
 }
+function sendEmail(participantData) 
+{
+    fetch("http://localhost:3000/sendMail", {
+     
+    // Adding method type
+    method: "POST",
+     
+    // Adding body or contents to send
+    body: JSON.stringify(participantData),
+     
+    // Adding headers to the request
+    headers: {
+        "Content-type": "application/json; charset=UTF-8"
+    }
+})
+ 
+// Converting to JSON
+.then(response => response.json())
+ 
+// Displaying results to console
+.then(json => console.log(json));
+    
+}
 function saveParticipantData(participantsData)
 {
     let allparticipantsData=getParticipantsSchema();
+
     allparticipantsData.push(participantsData);
     localStorage.setItem("participantSchema",JSON.stringify(allparticipantsData));
+    sendEmail(participantsData);
+    
     
 
 }
@@ -307,20 +333,12 @@ function editIndividualSchema(participantToEdit,oldParticipant,schemaName)
     
 
 }
-function editParticipantSchema(editedParticipant,participantToEdit)
+function editParticipantSchema(editedParticipant)
 {
     let allparicipants=getParticipantsSchema();
     allparicipants.push(editedParticipant);
-    //participants schema
-    // let revisedParticipants=allparicipants.map((participant)=>{
-    //     if(JSON.stringify(participant)===JSON.stringify(participantToEdit))
-    //     {
-    //         return editedParticipant;
-    //     }
-    //     return participant;
-    // });
-    // console.log(revisedParticipants);
     saveSchema(allparicipants,"participantSchema");
+    sendEmail(editedParticipant);
 
 }
 
@@ -406,8 +424,6 @@ function deleteIndividualSchema(participantToDelete,schemaName)
     {
     let interviewTiming=individualData.timing;
     let revisedTiming=interviewTiming.filter((timing)=>{
-        console.log(timing);
-        console.log(timingToDelete);
         if(JSON.stringify(timing)===JSON.stringify(timingToDelete))
         {
             return false;
