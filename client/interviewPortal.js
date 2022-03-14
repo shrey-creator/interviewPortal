@@ -58,7 +58,6 @@ function getIndividualDetails(participantData,schemaName)
     else
     emailTosave=participantData.interviewerEmail;
     let entryData=schema[emailTosave];
-    debugger;
     return {schema,interviewTiming,emailTosave,entryData};
 }
 }
