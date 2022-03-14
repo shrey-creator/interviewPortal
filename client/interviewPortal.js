@@ -8,8 +8,6 @@ function onLoad()
     addInterviewToTable(participant);
     })
 }
-
-
 function onScheduleClick()
 {
     let intervieweeEmail=document.getElementById("interviewee").value;
@@ -46,25 +44,6 @@ function getParticipantsSchema()
 
     return [];
 }
-function saveParticipantData(participantsData)
-{
-    let allparticipantsData=getParticipantsSchema();
-    allparticipantsData.push(participantsData);
-    localStorage.setItem("participantSchema",JSON.stringify(allparticipantsData));
-    
-
-}
-
-
-function getSchema(schemaName)
-{
-    let intervieweeSchema=JSON.parse(localStorage.getItem(schemaName));
-    if(intervieweeSchema)
-    return intervieweeSchema;
-
-    return {};
-}
-
 function getIndividualDetails(participantData,schemaName)
 {
     let schema=getSchema(schemaName);
@@ -79,8 +58,17 @@ function getIndividualDetails(participantData,schemaName)
     else
     emailTosave=participantData.interviewerEmail;
     let entryData=schema[emailTosave];
+    debugger;
     return {schema,interviewTiming,emailTosave,entryData};
 }
+}
+function getSchema(schemaName)
+{
+    let intervieweeSchema=JSON.parse(localStorage.getItem(schemaName));
+    if(intervieweeSchema)
+    return intervieweeSchema;
+
+    return {};
 }
 function getParticipantDiv(interviewData)
 {
@@ -133,7 +121,6 @@ function getParticipantDiv(interviewData)
 function saveIndividualSchema(participantData,schemaName)
 {
     let {schema,interviewTiming,emailTosave,entryData}=getIndividualDetails(participantData,schemaName);
-   
     if(entryData)
     {
         // TODO: check if there is clash in timing
@@ -148,9 +135,6 @@ function saveIndividualSchema(participantData,schemaName)
     }
     localStorage.setItem(schemaName,JSON.stringify(schema));
 }
-
-
-//  check if interviewee or interviewer is free for interview
 function isIndividualBusy(individualData,schemaName)
 {
     let individualSchema=getSchema(schemaName);
@@ -183,7 +167,6 @@ function isIndividualBusy(individualData,schemaName)
     return false;
 
 }
-
 function checkDataValadity(interviewData)
 {
     if(!interviewData.startTime)
@@ -220,8 +203,6 @@ function checkDataValadity(interviewData)
     return true;
 
 }
-
-
 function addInterviewToTable(interviewData)
 {
     let tr1=getParticipantDiv(interviewData);
@@ -235,6 +216,14 @@ function addInterviewToTable(interviewData)
 function saveSchema(data,schemaName)
 {
     localStorage.setItem(schemaName,JSON.stringify(data));
+}
+function saveParticipantData(participantsData)
+{
+    let allparticipantsData=getParticipantsSchema();
+    allparticipantsData.push(participantsData);
+    localStorage.setItem("participantSchema",JSON.stringify(allparticipantsData));
+    
+
 }
 function showErrorMessage(errorMessage)
 {
@@ -256,10 +245,8 @@ function clearInputFields()
 }
 
 // method used to edit
-function onEdit(event)
+function getDataforInputField(data_row)
 {
-    //getting all values from table
-    let data_row=event.path[2];
     let interviewerEmail=data_row.querySelector(".interviewerEmail").innerHTML;
     let intervieweeEmail=data_row.querySelector(".intervieweeEmail").innerHTML;
     let startTime= data_row.querySelector(".startTime").innerHTML;
@@ -271,7 +258,15 @@ function onEdit(event)
         startTime,
         endTime
     };
+    return participantData;
 
+}
+function onEdit(event)
+{
+    //getting all values from table
+    let data_row=event.path[2];
+    
+    let participantData=getDataforInputField(data_row);
     //assigning all values to input field
     document.getElementById("interviewee").value=participantData.intervieweeEmail;
     document.getElementById("interviewer").value=participantData.interviewerEmail;
@@ -293,7 +288,6 @@ function editDatabase(participantData,newPariticipantData)
     editIndividualSchema(newPariticipantData,participantData,"intervieweeSchema");
     editIndividualSchema(newPariticipantData,participantData,"interviewerSchema");
 }
-
 function editIndividualSchema(participantToEdit,oldParticipant,schemaName)
 {
     let individualSchema=getSchema(schemaName);
@@ -309,7 +303,7 @@ function editIndividualSchema(participantToEdit,oldParticipant,schemaName)
     interviewTiming.push(newTiming);
    individualSchema[indivdualEmail]={timing:[]};
     individualSchema[indivdualEmail].timing=interviewTiming;
-    console.log(interviewTiming);
+    // console.log(interviewTiming);
     saveSchema(individualSchema,schemaName);
     
 
@@ -393,27 +387,25 @@ function deleteInDatabase(participantToDelete)
         return true;
     });
     //intervieweeSchema
-    
      saveSchema(revisedParticipants,"participantSchema");
+     
     deleteIndividualSchema(participantToDelete,"intervieweeSchema");
+
     deleteIndividualSchema(participantToDelete,"interviewerSchema");
    
 }
 
 function deleteIndividualSchema(participantToDelete,schemaName)
 {
-    let individualSchema=getSchema(schemaName);
-    let indivdualEmail;
-    if(schemaName==="intervieweeSchema")
-    indivdualEmail=participantToDelete.intervieweeEmail;
-    else
-    indivdualEmail=participantToDelete.interviewerEmail;
-    
-    let individualData=individualSchema[indivdualEmail];
+    let individual=getIndividualDetails(participantToDelete,schemaName);
+    let individualSchema=individual.schema;
+    let timingToDelete=individual.interviewTiming;
+    let indivdualEmail=individual.emailTosave;
+    let individualData=individual.entryData;
+   
     if(individualData)
     {
     let interviewTiming=individualData.timing;
-    let timingToDelete=[participantToDelete.startTime,participantToDelete.endTime];
     let revisedTiming=interviewTiming.filter((timing)=>{
         console.log(timing);
         console.log(timingToDelete);
@@ -424,7 +416,6 @@ function deleteIndividualSchema(participantToDelete,schemaName)
         return true;
     });
     individualSchema[indivdualEmail].timing=revisedTiming;
-    console.log(individualSchema);
     saveSchema(individualSchema,schemaName);
 }
     
@@ -436,20 +427,7 @@ function onDelete(event)
     let data_row=event.path[2];
     let table=event.path[3];
     table.removeChild(data_row);
-    
-
-    let interviewerEmail=data_row.querySelector(".interviewerEmail").innerHTML;
-    let intervieweeEmail=data_row.querySelector(".intervieweeEmail").innerHTML;
-    let startTime= data_row.querySelector(".startTime").innerHTML;
-    let endTime=data_row.querySelector(".endTime").innerHTML;
-    //modifying database
-    
-    let participantData={
-        intervieweeEmail,
-        interviewerEmail,
-        startTime,
-        endTime
-    };
+    let participantData=getDataforInputField(data_row);
    
      deleteInDatabase(participantData);
    
