@@ -5,7 +5,7 @@
   "main": "./server/index.js",
   "dependencies": {
     "express": "^4.17.3",
-    "firebase": "^8.10.0",
+    "firebase": "^8.10.1",
     "nodemailer": "^6.7.2",
     "uuid": "^8.3.2"
   },
